@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import Button from './common/Button';
 import Icon, { IconProps } from './common/Icon';
 import * as mixins from './common/mixins';
-import { ExplorerContext, ShellProps } from '.';
+import { ExplorerContext, SidebarProps } from './Sidebar';
 import { initExplorer } from './Explorer';
 
 interface SubmenuTriggerIconProps extends IconProps {
@@ -624,7 +624,7 @@ interface MenuProps {
     collapsed: boolean;
     activeUrl: string;
     menuItems: MenuData;
-    user: ShellProps['user'];
+    user: SidebarProps['user'];
     accountUrl: string;
     logoutUrl: string;
     navigate(url: string): Promise<void>;
