@@ -1,7 +1,7 @@
-.nav-wrapper {
+.nav-wrapper,
+.new-nav-wrapper {
     position: relative;
     margin-left: -$menu-width;
-    width: $menu-width;
     float: left;
     display: flex;
     flex-direction: column;
@@ -17,6 +17,10 @@
             flex-flow: column nowrap;
         }
     }
+}
+
+.nav-wrapper {
+    width: $menu-width;
 }
 
 .nav-toggle.icon {
@@ -304,7 +308,12 @@ body.explorer-open {
         padding-left: $menu-width;
     }
 
-    .nav-wrapper {
+    body.nav-collapsed .wrapper {
+        padding-left: 50px;
+    }
+
+    .nav-wrapper,
+    .new-nav-wrapper {
         // height and position necessary to force it to 100% height of screen (with some JS help)
         position: absolute;
         left: 0;
@@ -314,9 +323,12 @@ body.explorer-open {
         .inner {
             height: 100%;
             position: fixed;
-            width: $menu-width;
             z-index: $nav-wrapper-inner-z-index;
         }
+    }
+
+    .nav-wrapper .inner {
+        width: $menu-width;
     }
 
     .nav-toggle {
@@ -481,8 +493,12 @@ body.explorer-open {
             transform: none;
         }
 
-        .nav-wrapper {
+        .nav-wrapper,
+        .new-nav-wrapper {
             margin-left: 0;
+        }
+
+        .nav-wrapper {
             width: $menu-width;
         }
 
@@ -533,13 +549,14 @@ footer,
 
     // Allows overspill of messages banner onto left menu, but also explorer
     // to spill over main content
-    .nav-wrapper {
+    .nav-wrapper,
+    .new-nav-wrapper {
         z-index: auto;
-    }
 
-    // footer is z-index: 100, so ensure the navigation sits on top of it.
-    .nav-wrapper.submenu-active {
-        z-index: 200;
+        // footer is z-index: 100, so ensure the navigation sits on top of it.
+        &.submenu-active {
+            z-index: 200;
+        }
     }
 }
 
@@ -571,7 +588,8 @@ footer,
             left: $menu-width-max;
         }
 
-        .nav-wrapper {
+        .nav-wrapper,
+        .new-nav-wrapper {
             width: $menu-width-max;
         }
     }
@@ -584,7 +602,8 @@ footer,
             left: 0;
         }
 
-        .nav-wrapper {
+        .nav-wrapper,
+        .new-nav-wrapper {
             width: $menu-width;
         }
     }
