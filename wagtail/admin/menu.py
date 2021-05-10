@@ -1,10 +1,14 @@
 from django.forms import Media, MediaDefiningClass
 from django.forms.utils import flatatt
 from django.template.loader import render_to_string
+from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 
+from wagtail.admin.staticfiles import versioned_static
+from wagtail.admin.ui.main_menu import Menu as MenuComponent, LinkMenuItem as LinkMenuItemComponent, SubMenuItem as SubMenuItemComponent
 from wagtail.core import hooks
+from wagtail.core.telepath import Adapter, register
 
 
 class MenuItem(metaclass=MediaDefiningClass):
@@ -49,6 +53,9 @@ class MenuItem(metaclass=MediaDefiningClass):
         context = self.get_context(request)
         return render_to_string(self.template, context, request=request)
 
+    def render_component(self, request):
+        return LinkMenuItemComponent(self.name, self.url, self.icon_name)
+
 
 class Menu:
     def __init__(self, register_hook_name, construct_hook_name=None):
@@ -67,7 +74,14 @@ class Menu:
         return self._registered_menu_items
 
     def menu_items_for_request(self, request):
-        return [item for item in self.registered_menu_items if item.is_shown(request)]
+        items = [item for item in self.registered_menu_items if item.is_shown(request)]
+
+        # provide a hook for modifying the menu, if construct_hook_name has been set
+        if self.construct_hook_name:
+            for fn in hooks.get_hooks(self.construct_hook_name):
+                fn(request, items)
+
+        return items
 
     def active_menu_items(self, request):
         return [item for item in self.menu_items_for_request(request) if item.is_active(request)]
@@ -81,16 +95,17 @@ class Menu:
 
     def render_html(self, request):
         menu_items = self.menu_items_for_request(request)
-
-        # provide a hook for modifying the menu, if construct_hook_name has been set
-        if self.construct_hook_name:
-            for fn in hooks.get_hooks(self.construct_hook_name):
-                fn(request, menu_items)
-
         rendered_menu_items = []
         for item in sorted(menu_items, key=lambda i: i.order):
             rendered_menu_items.append(item.render_html(request))
         return mark_safe(''.join(rendered_menu_items))
+
+    def render_component(self, request):
+        menu_items = self.menu_items_for_request(request)
+        rendered_menu_items = []
+        for item in sorted(menu_items, key=lambda i: i.order):
+            rendered_menu_items.append(item.render_component(request))
+        return MenuComponent(rendered_menu_items)
 
 
 class SubmenuMenuItem(MenuItem):
@@ -114,6 +129,9 @@ class SubmenuMenuItem(MenuItem):
         context['request'] = request
         return context
 
+    def render_component(self, request):
+        return SubMenuItemComponent(self.label, self.menu.render_component(request), icon_name=self.icon_name)
+
 
 class AdminOnlyMenuItem(MenuItem):
     """A MenuItem which is only shown to superusers"""
@@ -125,8 +143,6 @@ class AdminOnlyMenuItem(MenuItem):
 admin_menu = Menu(register_hook_name='register_admin_menu_item', construct_hook_name='construct_main_menu')
 settings_menu = Menu(register_hook_name='register_settings_menu_item', construct_hook_name='construct_settings_menu')
 reports_menu = Menu(register_hook_name='register_reports_menu_item', construct_hook_name='construct_reports_menu')
-
-
 
 
 def serialize_admin_menu_item(request, item):

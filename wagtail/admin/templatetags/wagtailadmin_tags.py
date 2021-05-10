@@ -46,6 +46,7 @@ from wagtail.admin.search import admin_search_areas
 from wagtail.admin.staticfiles import versioned_static
 
 from wagtail.admin.menu import serialize_admin_menu
+from wagtail.core.telepath import JSContext
 
 
 register = template.Library()
@@ -676,6 +677,7 @@ def shell_props(context):
         'searchUrl': search_area.url if search_area else None,
         'explorerStartPageId': explorer_start_page.id if explorer_start_page else None,
         'menuItems': serialize_admin_menu(request, admin_menu),
+        'menuItemsTelepath': JSContext().pack(admin_menu.render_component(request)),
         'user': {
             'name': request.user.first_name or request.user.get_username(),
             'avatarUrl': avatar_url(request.user, size=50),
