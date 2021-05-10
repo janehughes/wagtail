@@ -5,11 +5,7 @@ import { ExplorerContext, ShellProps } from '.';
 import {SearchInput} from './SearchInput';
 import {Menu} from './Menu';
 import { Logo } from './Logo';
-
-// @ts-ignore
-// import LeftArrowIcon from '../icons/angle-double-left-solid.svg';
-// @ts-ignore
-// import RightArrowIcon from '../icons/angle-double-right-solid.svg';
+import Icon from './common/Icon';
 
 const InnerWrapper = styled.div`
     height: 100%;
@@ -74,7 +70,7 @@ export const Sidebar: React.FunctionComponent<SidebarProps> =  ({homeUrl, logoIm
         <>
             <InnerWrapper>
                 <CollapseToggleWrapper onClick={onClickCollapseToggle} className="button">
-                    {collapsed ? "Open" : "Close"}
+                    {collapsed ? <Icon name="angle-double-right" /> : <Icon name="angle-double-left" />}
                 </CollapseToggleWrapper>
 
                 <Logo collapsed={collapsed} images={logoImages} homeUrl={homeUrl} navigate={navigate} />
